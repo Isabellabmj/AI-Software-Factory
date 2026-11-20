@@ -1,0 +1,358 @@
+{
+  "name": "Refine Task Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bb334089-1538-48ac-82f3-bfb9be799609",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3e9b7954-63c4-4475-9d0d-ca35e9980675",
+              "leftValue": "={{ $json.user.login }}",
+              "rightValue": "Isabellabmj",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "33011cff-28a0-476f-892b-10c3aeeb5b5c",
+      "name": "Validate Author"
+    },
+    {
+      "parameters": {
+        "resource": "repository",
+        "owner": {
+          "__rl": true,
+          "value": "Isabellabmj",
+          "mode": "list",
+          "cachedResultName": "Isabellabmj",
+          "cachedResultUrl": "https://github.com/Isabellabmj"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "AI-Software-Factory",
+          "mode": "list",
+          "cachedResultName": "AI-Software-Factory",
+          "cachedResultUrl": "https://github.com/Isabellabmj/AI-Software-Factory"
+        },
+        "returnAll": true,
+        "getRepositoryIssuesFilters": {
+          "labels": "Ideas",
+          "state": "open"
+        }
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "e450de64-59ca-490d-aa41-d7bcccd8c091",
+      "name": "Get Ideas",
+      "webhookId": "2e50628d-5c1e-4005-bb0b-3579504d38bd",
+      "credentials": {
+        "githubApi": {
+          "id": "qxVYfGPdDgOpeae0",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "Isabellabmj",
+          "mode": "list",
+          "cachedResultName": "Isabellabmj",
+          "cachedResultUrl": "https://github.com/Isabellabmj"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "AI-Software-Factory",
+          "mode": "list",
+          "cachedResultName": "AI-Software-Factory",
+          "cachedResultUrl": "https://github.com/Isabellabmj/AI-Software-Factory"
+        },
+        "issueNumber": "={{ $json.number }}",
+        "editFields": {
+          "labels": [
+            {
+              "label": "Refining"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "ccd14e57-01ec-49a7-90c3-9ebbaed18075",
+      "name": "Set Refining",
+      "webhookId": "a97a1a38-c98d-4349-b057-3a5ebc1d154e",
+      "credentials": {
+        "githubApi": {
+          "id": "qxVYfGPdDgOpeae0",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Title: {{ $json.title }}\n\nDescription: {{ $json.body }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "# Role You are an AI assistant in a software factory your task is to transform the user's ideas into clear, structured and testable development tasks.  # Instructions - Analyse the user's idea and previous comments - Preserve the user's original intention - Define clear and measureable requirements - Do not add unnecessary fundtionality - Ask clearifying questions instead of making assumptions - Do not invent technical requirements - Never approve a task on behalf of the user - Do not write code - Write all content and questions in Danish - Keep the section headings in English  # Output format  ## Title The title of the task  ## Objective What should we develop  ## Motivation Why should it be developed?  ## Requirements Functional requirements  ## Constraints Technical requirements and limitations  ## Acceptance Criteria Specific and measurable acceptance criteria  ## Testing How the solution should be tested  ## Clarifying Questions Questions that need to be answered before development. If there are no questions, write \"Ingen\"."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "43ecd3e5-e8fe-4789-b794-418d6281606a",
+      "name": "Refine Task"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        112
+      ],
+      "id": "f6cbebbe-bf57-4106-a3ae-e0f3510a04bb",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "gE9cN9UBGAhgqK71",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "createComment",
+        "owner": {
+          "__rl": true,
+          "value": "Isabellabmj",
+          "mode": "list",
+          "cachedResultName": "Isabellabmj",
+          "cachedResultUrl": "https://github.com/Isabellabmj"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "AI-Software-Factory",
+          "mode": "list",
+          "cachedResultName": "AI-Software-Factory",
+          "cachedResultUrl": "https://github.com/Isabellabmj/AI-Software-Factory"
+        },
+        "issueNumber": "={{ $('Get Ideas').item.json.number }}",
+        "body": "={{ $json.text }}"
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1264,
+        -96
+      ],
+      "id": "75eeca4a-9412-4734-a353-9efc5b4a7e0c",
+      "name": "Create Comment",
+      "webhookId": "4de39aa4-0275-4264-85be-65a8d4f8371a",
+      "credentials": {
+        "githubApi": {
+          "id": "qxVYfGPdDgOpeae0",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "Isabellabmj",
+          "mode": "list",
+          "cachedResultName": "Isabellabmj",
+          "cachedResultUrl": "https://github.com/Isabellabmj"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "AI-Software-Factory",
+          "mode": "list",
+          "cachedResultName": "AI-Software-Factory",
+          "cachedResultUrl": "https://github.com/Isabellabmj/AI-Software-Factory"
+        },
+        "issueNumber": "={{ $('Get Ideas').item.json.number }}",
+        "editFields": {
+          "labels": [
+            {
+              "label": "Ready for approval"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1.1,
+      "position": [
+        1488,
+        -96
+      ],
+      "id": "1cfc9603-3365-46f5-ab6e-996d5e7af153",
+      "name": "Set Ready for approval",
+      "webhookId": "7c4b76cd-b4c5-4d3f-a740-f6bddc7fe612",
+      "credentials": {
+        "githubApi": {
+          "id": "qxVYfGPdDgOpeae0",
+          "name": "GitHub account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Ideas": {
+      "main": [
+        [
+          {
+            "node": "Validate Author",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Author": {
+      "main": [
+        [
+          {
+            "node": "Set Refining",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Refining": {
+      "main": [
+        [
+          {
+            "node": "Refine Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Refine Task",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refine Task": {
+      "main": [
+        [
+          {
+            "node": "Create Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Comment": {
+      "main": [
+        [
+          {
+            "node": "Set Ready for approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6e064fd7-5dcd-4e7a-8999-f24776ad1c83",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d06d9bb05728dfe923fddf1a8ae4febda352b0dd4d377fa2fb8312600e8bde79"
+  },
+  "nodeGroups": [],
+  "id": "v5Yu7SxXrGcQxmon",
+  "tags": []
+}
